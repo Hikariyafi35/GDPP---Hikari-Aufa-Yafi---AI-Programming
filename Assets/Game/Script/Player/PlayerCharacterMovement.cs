@@ -20,6 +20,7 @@ public class PlayerCharacterMovement : MonoBehaviour
     private float _sprintSpeed = 2;
     [SerializeField]
     private float _acceleration = 0.5f;
+    public bool IsSprint => _isSprint;
     [SerializeField] 
     private CharacterController _characterController;
 
