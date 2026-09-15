@@ -7,6 +7,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
 {
     // Variable untuk menyimpan reference object input action 
     private GameInputAction _inputAction;
+    public UnityEvent<Vector2> OnMoveInput;
+    public UnityEvent<bool> OnSprintInput; 
     private void Awake()
     {
         // Membuat object GameInputAction dan menyimpan reference nya 
@@ -29,11 +31,27 @@ public class InputManager : MonoBehaviour, IPlayerActions
             // ketika input interact ditekan 
             Debug.Log("Interact"); 
         } 
-    } 
-    public void OnMove(InputAction.CallbackContext context) 
-    { 
-        // context.ReadValue() digunakan untuk membaca nilai input 
-        // dengan tipe vector, kemudian dimunculkan pada log di console 
-        Debug.Log(context.ReadValue<Vector2>());  
+    }
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        // Memanggil on move input ketika input move ditekan dan dilepas 
+        // Event akan mengirimkan data arah input 
+        OnMoveInput?.Invoke(context.ReadValue<Vector2>());
+        Debug.Log(context.ReadValue<Vector2>());
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Debug.Log("SPRINT PERFORMED → TRUE");
+            OnSprintInput?.Invoke(true);
+        }
+        if(context.canceled)
+        {
+            Debug.Log("SPRINT CANCELED → FALSE");
+            OnSprintInput?.Invoke(false);
+
+        }
     }
 }
