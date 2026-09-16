@@ -720,6 +720,7 @@ GameObject:
   - component: {fileID: 1207987835}
   - component: {fileID: 1207987837}
   - component: {fileID: 1207987836}
+  - component: {fileID: 1207987838}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -786,6 +787,23 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &1207987838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207987834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3542fc4255d79644faa4125b2ed13519, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterStamina
+  _maxStamina: 100
+  _sprintStaminaCost: 20
+  _staminaRegenValue: 20
+  _currentStamina: 0
+  _characterMovement: {fileID: 1207987836}
 --- !u!1 &1323316911
 GameObject:
   m_ObjectHideFlags: 0
