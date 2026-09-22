@@ -21,6 +21,8 @@ public class PlayerCharacterMovement : MonoBehaviour
     [SerializeField]
     private float _acceleration = 0.5f;
     public bool IsSprint => _isSprint;
+    // Membuat property untuk menentukan apakah movement sedang aktif
+    public bool Enabled { get; private set; } = true;
     [SerializeField] 
     private CharacterController _characterController;
 
@@ -75,11 +77,13 @@ public class PlayerCharacterMovement : MonoBehaviour
     }
     public void Move()
     {
-
-        CalculateVelocityXZ();
-        CalculateVelocityY();
-        Vector3 velocity = new Vector3(_velocityXZ.x, _velocityY, _velocityXZ.z);
-        _characterController.Move(velocity);
+        if (Enabled == true)
+        {
+            CalculateVelocityXZ();
+            CalculateVelocityY();
+            Vector3 velocity = new Vector3(_velocityXZ.x, _velocityY, _velocityXZ.z);
+            _characterController.Move(velocity);
+        }
     }
     public void SetSprint(bool isSprint)
     {
@@ -117,5 +121,10 @@ public class PlayerCharacterMovement : MonoBehaviour
         LayerMask groundLayer = LayerMask.GetMask("Ground");
 
         _isGrounded = Physics.CheckSphere(transform.position, 0.5f, groundLayer);
+    }
+    // Mengubah status aktif movement
+    public void SetEnabled(bool isEnabled)
+    {
+        Enabled = isEnabled;
     }
 }

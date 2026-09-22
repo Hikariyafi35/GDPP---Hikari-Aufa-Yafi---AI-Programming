@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviour, IPlayerActions
     private GameInputAction _inputAction;
     public UnityEvent<Vector2> OnMoveInput;
     public UnityEvent<bool> OnSprintInput; 
+    public UnityEvent OnInteractInput;
     private void Awake()
     {
         // Membuat object GameInputAction dan menyimpan reference nya 
@@ -23,14 +24,14 @@ public class InputManager : MonoBehaviour, IPlayerActions
         _inputAction.Player.SetCallbacks(this);
 
     } 
-    public void OnInteract(InputAction.CallbackContext context) 
-    { 
-        if (context.performed) 
-        { 
-            // Memunculkan log interact di console  
-            // ketika input interact ditekan 
-            Debug.Log("Interact"); 
-        } 
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        // contect.performed digunakan untuk mengecek apakah input ditekan
+        if (context.performed)
+        {
+            // Jika input ditekan maka trigger event OnInteractInput
+            OnInteractInput?.Invoke();
+        }
     }
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -47,11 +48,13 @@ public class InputManager : MonoBehaviour, IPlayerActions
             Debug.Log("SPRINT PERFORMED → TRUE");
             OnSprintInput?.Invoke(true);
         }
-        if(context.canceled)
+        if (context.canceled)
         {
             Debug.Log("SPRINT CANCELED → FALSE");
             OnSprintInput?.Invoke(false);
 
         }
     }
+    
+    
 }
