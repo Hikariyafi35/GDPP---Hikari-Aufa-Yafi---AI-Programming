@@ -10,6 +10,8 @@ public class InputManager : MonoBehaviour, IPlayerActions
     public UnityEvent<Vector2> OnMoveInput;
     public UnityEvent<bool> OnSprintInput; 
     public UnityEvent OnInteractInput;
+        // Membuat event OnFlashlightInput
+    public UnityEvent OnFlashlightInput;
     private void Awake()
     {
         // Membuat object GameInputAction dan menyimpan reference nya 
@@ -55,6 +57,14 @@ public class InputManager : MonoBehaviour, IPlayerActions
 
         }
     }
-    
-    
+
+    public void OnFlashlight(InputAction.CallbackContext context)
+    {
+        // contect.performed digunakan untuk mengecek apakah input ditekan
+        if (context.performed)
+        {
+            // Jika input ditekan maka trigger event OnFlashlightInput
+            OnFlashlightInput?.Invoke();
+        }
+    }
 }

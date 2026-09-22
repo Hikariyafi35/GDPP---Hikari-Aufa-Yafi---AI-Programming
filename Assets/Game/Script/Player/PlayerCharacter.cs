@@ -23,6 +23,9 @@ public class PlayerCharacter : MonoBehaviour
     // Variable untuk reference ke module InputManager
     [SerializeField]
     private InputManager _input;
+        // Variable untuk reference ke module Flashlight
+    [SerializeField]
+    private Flashlight _flashlight;
 
 
     // Property untuk mengakses variable _movement
@@ -33,6 +36,8 @@ public class PlayerCharacter : MonoBehaviour
     public InventoryManager Inventory => _inventory;
     // Property untuk mengakses variable _interactDetector
     public InteractDetector InteractDetector => _interactDetector;
+        // Property untuk mengakses variable _flashlight
+    public Flashlight Flashlight => _flashlight;
     // Property untuk mengakses variable _camera
     public CameraManager Camera => _camera;
     // Property untuk mengakses variable _input

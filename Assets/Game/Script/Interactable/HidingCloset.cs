@@ -32,25 +32,42 @@ public class HidingCloset : MonoBehaviour, IInteractable
     // dengan hiding closet
     public void Interact(PlayerCharacter character)
     {
+        // Memastikan ada player yang berinteraksi
+        if (character == null)
+        {
+            return;
+        }
+
         // Memastikan ada reference posisi hide, posisi unhide,
         // dan door
-        if (_hidePosition != null && _unhidePosition != null && _door != null)
+        if (_hidePosition == null || _unhidePosition == null || _door == null)
         {
-            // Memasukan reference player character yang berinteraksi
-            // sebagai karakter yang sembunyi
-            _hidingPlayer = character;
-            // Mengecek apakah ada coroutine hide yang sedang berjalan
-            if (_hideCoroutine != null)
-            {
-                // Jika iya, maka hentikan coroutine
-                StopCoroutine(_hideCoroutine);
-            }
-            // Jalankan coroutine hide untuk menganimasikan proses sembunyi
-            _hideCoroutine = StartCoroutine(Hide());
+            return;
         }
+
+        // Memasukan reference player character yang berinteraksi
+        // sebagai karakter yang sembunyi
+        _hidingPlayer = character;
+
+        // Mengecek apakah ada coroutine hide yang sedang berjalan
+        if (_hideCoroutine != null)
+        {
+            // Jika iya, maka hentikan coroutine
+            StopCoroutine(_hideCoroutine);
+        }
+
+        // Jalankan coroutine hide untuk menganimasikan proses sembunyi
+        _hideCoroutine = StartCoroutine(Hide());
     }
+
     public IEnumerator Hide()
     {
+        // Memastikan masih ada reference player yang sedang sembunyi
+        if (_hidingPlayer == null)
+        {
+            yield break;
+        }
+
         // Membuat status player menjadi hiding
         _hidingPlayer.SetIsHiding(true);
         // Menonaktifkan input camera
@@ -79,27 +96,48 @@ public class HidingCloset : MonoBehaviour, IInteractable
         {
             // Menambahkan waktu animasi dengan satu setiap detik
             time = time + Time.deltaTime;
+
+            // Memastikan reference player masih ada
+            if (_hidingPlayer == null)
+            {
+                yield break;
+            }
+
             // Melakukan interpolasi posisi awal ke posisi target(hide position) 
             // Menentukan alpha dengan rumus time/duration
             // alpha bernilai 0 s.d 1, alpha merupakan nilai yang dianimasikan
             // 0 => posisi awal, 1 => posisi target 
-            _hidingPlayer.transform.position = Vector3.Lerp(startPosition,
-                                            _hidePosition.position,
-                                            time / _duration);
+            _hidingPlayer.transform.position = Vector3.Lerp(
+                startPosition,
+                _hidePosition.position,
+                time / _duration
+            );
+
             // Melakukan interpolasi sudut rotasi awal 
             // ke sudut rotasi target(hide position) 
             // Menentukan alpha dengan rumus time/duration
             // alpha bernilai 0 s.d 1, alpha merupakan nilai yang dianimasikan
             // 0 => sudut rotasi awal, 1 => sudut rotasi target 
-            float panAxis = Mathf.Lerp(startRotation,
-                                    _hidePosition.eulerAngles.y,
-                                    time / _duration);
+            float panAxis = Mathf.Lerp(
+                startRotation,
+                _hidePosition.eulerAngles.y,
+                time / _duration
+            );
+
             // Mengubah rotasi pan camera dengan sudut rotasi yang dihitung
             // menggunakan interpolasi  
             _hidingPlayer.Camera.SetPanAxisValue(panAxis);
+
             // Animasi dijalankan setiap frame 
             yield return null;
         }
+
+        // Memastikan reference player masih ada
+        if (_hidingPlayer == null)
+        {
+            yield break;
+        }
+
         // Memaksa posisi player ke posisi hide position
         // setelah selesai animasi
         _hidingPlayer.transform.position = _hidePosition.position;
@@ -112,11 +150,32 @@ public class HidingCloset : MonoBehaviour, IInteractable
 
         // Menunggu selama masih menjalankan animasi tutup pintu
         yield return new WaitWhile(() => _door.IsAnimating);
-        // listen function StopHiding dari event input interact
-        _hidingPlayer.Input.OnInteractInput.AddListener(StopHiding);
+
+        // Memastikan reference player dan input masih ada
+        if (_hidingPlayer != null && _hidingPlayer.Input != null)
+        {
+            // listen function StopHiding dari event input interact
+            _hidingPlayer.Input.OnInteractInput.AddListener(StopHiding);
+        }
+
+        // Mengosongkan reference coroutine hide
+        _hideCoroutine = null;
     }
+
     public IEnumerator Unhide()
     {
+        // Memastikan masih ada player yang sedang sembunyi
+        if (_hidingPlayer == null)
+        {
+            yield break;
+        }
+
+        // Memastikan reference door masih ada
+        if (_door == null)
+        {
+            yield break;
+        }
+
         // Membuka pintu lemari
         _door.Open();
         // Menunggu selama masih menjalankan animasi buka pintu
@@ -134,31 +193,51 @@ public class HidingCloset : MonoBehaviour, IInteractable
         {
             // Menambahkan waktu animasi dengan satu setiap detik
             time = time + Time.deltaTime;
+
+            // Memastikan reference player masih ada
+            if (_hidingPlayer == null)
+            {
+                yield break;
+            }
+
             // Melakukan interpolasi posisi awal ke posisi target(unhide position) 
             // Menentukan alpha dengan rumus time/duration
             // alpha bernilai 0 s.d 1, alpha merupakan nilai yang dianimasikan
             // 0 => posisi awal, 1 => posisi target 
-            _hidingPlayer.transform.position = Vector3.Lerp(startPosition,
-                                                        _unhidePosition.position,
-                                                        time / _duration);
+            _hidingPlayer.transform.position = Vector3.Lerp(
+                startPosition,
+                _unhidePosition.position,
+                time / _duration
+            );
+
             // Melakukan interpolasi sudut rotasi awal 
-            // ke sudut rotasi target(unhide position) 
+            // ke posisi rotasi target(unhide position) 
             // Menentukan alpha dengan rumus time/duration
             // alpha bernilai 0 s.d 1, alpha merupakan nilai yang dianimasikan
             // 0 => sudut rotasi awal, 1 => sudut rotasi target 
-            float panAxis = Mathf.Lerp(startRotation,
-                                    _unhidePosition.rotation.y,
-                                    time / _duration);
+            float panAxis = Mathf.Lerp(
+                startRotation,
+                _unhidePosition.eulerAngles.y,
+                time / _duration
+            );
+
             // Mengubah rotasi pan camera dengan sudut rotasi yang dihitung
             // menggunakan interpolasi  
             _hidingPlayer.Camera.SetPanAxisValue(panAxis);
+
+            // Animasi dijalankan setiap frame
             yield return null;
         }
+
+        // Memastikan reference player masih ada
+        if (_hidingPlayer == null)
+        {
+            yield break;
+        }
+
         // Memaksa posisi player ke posisi unhide position
         // setelah selesai animasi
         _hidingPlayer.transform.position = _unhidePosition.position;
-        // Memaksa rotasi player ke sudut rotasi unhide position
-        // setelah selesai animasi
         _hidingPlayer.transform.rotation = _unhidePosition.rotation;
 
         // Menutup pintu lemari
@@ -172,22 +251,39 @@ public class HidingCloset : MonoBehaviour, IInteractable
         _hidingPlayer.InteractDetector.SetEnabled(true);
         // Membuat status player menjadi tidak hiding
         _hidingPlayer.SetIsHiding(false);
-        // Mengosongkan kembali reference ke player yang hiding
-        _hidingPlayer = null;
 
         // Menunggu selama masih menjalankan animasi tutup pintu
         yield return new WaitWhile(() => _door.IsAnimating);
-        _hidingPlayer.Input.OnInteractInput.RemoveListener(StopHiding);
+
+        // Menghapus listener sebelum reference player dikosongkan
+        if (_hidingPlayer != null && _hidingPlayer.Input != null)
+        {
+            _hidingPlayer.Input.OnInteractInput.RemoveListener(StopHiding);
+        }
+
+        // Mengosongkan kembali reference ke player yang hiding
+        _hidingPlayer = null;
+
+        // Mengosongkan reference coroutine unhide
+        _unhideCoroutine = null;
     }
-        public void StopHiding()
+
+    public void StopHiding()
     {
+        // Memastikan ada player yang sedang sembunyi
+        if (_hidingPlayer == null)
+        {
+            return;
+        }
+
         // Mengecek apakah ada coroutine unhide yang sedang berjalan
         if (_unhideCoroutine != null)
         {
             // Jika iya, maka hentikan coroutine
             StopCoroutine(_unhideCoroutine);
         }
+
         // Jalankan coroutine unhide untuk menganimasikan proses keluar lemari
-        StartCoroutine(Unhide());
+        _unhideCoroutine = StartCoroutine(Unhide());
     }
 }
